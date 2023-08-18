@@ -85,7 +85,7 @@ public class CallDataController {
             audio.add(new ByteArrayResource(fileContent));
         }
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentType(MediaType.APPLICATION_JSON);
         if (audio.size() != 0) {
             return ResponseEntity.status(HttpStatus.OK).headers(headers).body(audio);
         } else {
