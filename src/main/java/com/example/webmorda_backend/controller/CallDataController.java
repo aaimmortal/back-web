@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,6 +22,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -74,23 +77,29 @@ public class CallDataController {
 
     @GetMapping("/getAudioBetween")
     public ResponseEntity<?> getAudioBetween(@RequestParam("dateTime") String dateTime, @RequestParam("dateTime2") String dateTime2) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime localDateTime1 = LocalDateTime.parse(dateTime, formatter);
         LocalDateTime localDateTime2 = LocalDateTime.parse(dateTime2, formatter);
         List<CallData> res = callDataService.getCallDataByCalldateBetween(localDateTime1, localDateTime2);
-        List<ByteArrayResource> audio = new ArrayList<>();
+        if (res.size() == 0) {
+            return ResponseEntity.status(HttpStatus.OK).body("No data");
+        }
         for (CallData re : res) {
             Path path = Paths.get(re.getAudio_path());
             byte[] fileContent = Files.readAllBytes(path);
-            audio.add(new ByteArrayResource(fileContent));
+            ZipEntry zipEntry = new ZipEntry(re.getAudio_path());
+            zipOutputStream.putNextEntry(zipEntry);
+            zipOutputStream.write(fileContent);
+            zipOutputStream.closeEntry();
         }
+        zipOutputStream.close();
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        if (audio.size() != 0) {
-            return ResponseEntity.status(HttpStatus.OK).headers(headers).body(audio);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No data");
-        }
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        byte[] zipBytes = byteArrayOutputStream.toByteArray();
+        ByteArrayResource resource = new ByteArrayResource(zipBytes);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).headers(headers).body(resource);
     }
 }
 
