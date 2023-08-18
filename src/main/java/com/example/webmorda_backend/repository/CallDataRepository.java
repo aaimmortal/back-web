@@ -19,4 +19,5 @@ public interface CallDataRepository extends JpaRepository<CallData, String> {
 
     @Query("SELECT new com.example.webmorda_backend.model.DispositionCountByAccount(c.src,c.disposition,COUNT(*))FROM CallData c GROUP BY c.src, c.disposition")
     List<DispositionCountByAccount> getDispositionCountByAccount();
+
 }

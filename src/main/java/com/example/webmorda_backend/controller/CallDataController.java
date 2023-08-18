@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin(origins = "*")
@@ -59,6 +60,23 @@ public class CallDataController {
         List<DispositionCountByAccount> res = callDataService.getDispositionCountByAccount();
         if (res != null) {
             return ResponseEntity.status(HttpStatus.OK).body(res);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No data");
+        }
+    }
+
+    @GetMapping("/getAudioBetween")
+    public ResponseEntity<?> getAudioBetween(@RequestParam("dateTime") String dateTime, @RequestParam("dateTime2") String dateTime2) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime localDateTime1 = LocalDateTime.parse(dateTime, formatter);
+        LocalDateTime localDateTime2 = LocalDateTime.parse(dateTime2, formatter);
+        List<CallData> res = callDataService.getCallDataByCalldateBetween(localDateTime1, localDateTime2);
+        List<String> audio = new ArrayList<>();
+        for (CallData re : res) {
+            audio.add(re.getAudio_path());
+        }
+        if (audio.size() != 0) {
+            return ResponseEntity.status(HttpStatus.OK).body(audio);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No data");
         }
