@@ -99,7 +99,7 @@ public class CallDataController {
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         byte[] zipBytes = byteArrayOutputStream.toByteArray();
         ByteArrayResource resource = new ByteArrayResource(zipBytes);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).headers(headers).body(resource);
+        return ResponseEntity.status(HttpStatus.OK).headers(headers).body(resource);
     }
 }
 
