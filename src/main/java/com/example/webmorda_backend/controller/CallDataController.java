@@ -5,11 +5,18 @@ import com.example.webmorda_backend.model.DispositionCount;
 import com.example.webmorda_backend.model.DispositionCountByAccount;
 import com.example.webmorda_backend.service.CallDataService;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -66,17 +73,21 @@ public class CallDataController {
     }
 
     @GetMapping("/getAudioBetween")
-    public ResponseEntity<?> getAudioBetween(@RequestParam("dateTime") String dateTime, @RequestParam("dateTime2") String dateTime2) {
+    public ResponseEntity<?> getAudioBetween(@RequestParam("dateTime") String dateTime, @RequestParam("dateTime2") String dateTime2) throws IOException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime localDateTime1 = LocalDateTime.parse(dateTime, formatter);
         LocalDateTime localDateTime2 = LocalDateTime.parse(dateTime2, formatter);
         List<CallData> res = callDataService.getCallDataByCalldateBetween(localDateTime1, localDateTime2);
-        List<String> audio = new ArrayList<>();
+        List<ByteArrayResource> audio = new ArrayList<>();
         for (CallData re : res) {
-            audio.add(re.getAudio_path());
+            Path path = Paths.get(re.getAudio_path());
+            byte[] fileContent = Files.readAllBytes(path);
+            audio.add(new ByteArrayResource(fileContent));
         }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         if (audio.size() != 0) {
-            return ResponseEntity.status(HttpStatus.OK).body(audio);
+            return ResponseEntity.status(HttpStatus.OK).headers(headers).body(audio);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No data");
         }
