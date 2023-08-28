@@ -65,6 +65,13 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.asteriskjava/asterisk-java -->
+		<dependency>
+			<groupId>org.asteriskjava</groupId>
+			<artifactId>asterisk-java</artifactId>
+			<version>3.39.0</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
