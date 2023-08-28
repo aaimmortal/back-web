@@ -33,11 +33,14 @@ public class AsteriskAmiService {
                                 String agent = dialEvent.getDestination().substring(4, 8);
                                 String status = dialEvent.getDialStatus();
                                 String calldataid = dialEvent.getUniqueId();
-                                AgentCallData agentCallData = new AgentCallData();
-                                agentCallData.setAgentid(agent);
-                                agentCallData.setDisposition(status);
-                                agentCallData.setCalldataid(calldataid);
-                                agentCallDataService.add(agentCallData);
+                                AgentCallData agentCallData;
+                                if (!agentCallDataService.existsByCallDataId(calldataid)) {
+                                    agentCallData = new AgentCallData();
+                                    agentCallData.setAgentid(agent);
+                                    agentCallData.setDisposition(status);
+                                    agentCallData.setCalldataid(calldataid);
+                                    agentCallDataService.add(agentCallData);
+                                }
                             }
                         }
                     }
@@ -45,13 +48,13 @@ public class AsteriskAmiService {
                         String id = agentConnectEvent.getLinkedId();
                         AgentCallData agentCallData = agentCallDataService.getAgentCalldataByCalldataid(id);
                         agentCallData.setConnect(convertToLocalDateTimeViaInstant(agentConnectEvent.getDateReceived()));
-                        agentCallDataRepository.save(agentCallData);
+                        agentCallDataService.add(agentCallData);
                     }
                     if (event instanceof AgentCompleteEvent agentCompleteEvent) {
                         String id = agentCompleteEvent.getLinkedId();
                         AgentCallData agentCallData = agentCallDataService.getAgentCalldataByCalldataid(id);
                         agentCallData.setDisconnect(convertToLocalDateTimeViaInstant(agentCompleteEvent.getDateReceived()));
-                        agentCallDataRepository.save(agentCallData);
+                        agentCallDataService.add(agentCallData);
                     }
                 }
             });
