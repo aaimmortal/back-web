@@ -1,5 +1,6 @@
 package com.example.webmorda_backend.controller;
 
+import com.example.webmorda_backend.entity.AgentCallData;
 import com.example.webmorda_backend.entity.CallData;
 import com.example.webmorda_backend.model.DispositionCount;
 import com.example.webmorda_backend.model.DispositionCountByAccount;
@@ -88,12 +89,14 @@ public class CallDataController {
             return ResponseEntity.status(HttpStatus.OK).body("No data");
         }
         for (CallData re : res) {
-            Path path = Paths.get(re.getAudio_path());
-            byte[] fileContent = Files.readAllBytes(path);
-            ZipEntry zipEntry = new ZipEntry(re.getAudio_path());
-            zipOutputStream.putNextEntry(zipEntry);
-            zipOutputStream.write(fileContent);
-            zipOutputStream.closeEntry();
+            if (re.getAudio_path() != null) {
+                Path path = Paths.get(re.getAudio_path());
+                byte[] fileContent = Files.readAllBytes(path);
+                ZipEntry zipEntry = new ZipEntry(re.getAudio_path());
+                zipOutputStream.putNextEntry(zipEntry);
+                zipOutputStream.write(fileContent);
+                zipOutputStream.closeEntry();
+            }
         }
         zipOutputStream.close();
         HttpHeaders headers = new HttpHeaders();
@@ -101,6 +104,16 @@ public class CallDataController {
         byte[] zipBytes = byteArrayOutputStream.toByteArray();
         ByteArrayResource resource = new ByteArrayResource(zipBytes);
         return ResponseEntity.status(HttpStatus.OK).headers(headers).body(resource);
+    }
+
+    @GetMapping("/agentCallData")
+    public ResponseEntity<?> agentCallData(@RequestParam("callDataId") String callDataId) {
+        List<AgentCallData> agentCallDataList = agentCallDataService.getAgentCallDataByCallDataID(callDataId);
+        if (agentCallDataList != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(agentCallDataList);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No data");
+        }
     }
 }
 
