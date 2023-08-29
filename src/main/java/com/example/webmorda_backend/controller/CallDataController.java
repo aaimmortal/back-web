@@ -8,6 +8,8 @@ import com.example.webmorda_backend.service.AgentCallDataService;
 import com.example.webmorda_backend.service.CallDataService;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -75,6 +77,20 @@ public class CallDataController {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No data");
         }
+    }
+
+    @GetMapping("/audio")
+    public ResponseEntity<?> getAudio(@RequestParam("id") String id) throws IOException {
+        Path filePath = Paths.get(callDataService.getCallDataByUniqueId(id).getAudio_path());
+        Resource resource = new UrlResource(filePath.toUri());
+
+        if (!resource.exists() || !resource.isReadable()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No data");
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
     }
 
     @GetMapping("/getAudioBetween")
