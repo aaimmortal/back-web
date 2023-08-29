@@ -19,6 +19,10 @@ public class CallDataService {
         return callDataRepository.getCallDataByCalldateBetween(dateTime, dateTime2);
     }
 
+    public CallData getCallDataByUniqueId(String id) {
+        return callDataRepository.getCallDataByUniqueid(id);
+    }
+
     public List<DispositionCount> getCountByDisposition() {
         return callDataRepository.getCountByDisposition();
     }
