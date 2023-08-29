@@ -89,7 +89,7 @@ public class CallDataController {
             return ResponseEntity.status(HttpStatus.OK).body("No data");
         }
         for (CallData re : res) {
-            if (re.getAudio_path() != null || !re.getAudio_path().equals("")) {
+            if (!re.getAudio_path().equals("")) {
                 Path path = Paths.get(re.getAudio_path());
                 byte[] fileContent = Files.readAllBytes(path);
                 ZipEntry zipEntry = new ZipEntry(re.getAudio_path());
