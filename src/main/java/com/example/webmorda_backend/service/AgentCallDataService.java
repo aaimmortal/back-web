@@ -25,8 +25,8 @@ public class AgentCallDataService {
         return agentCallDataRepository.getDispositionCountByAccount();
     }
 
-    public boolean existsByCallDataId(String id) {
-        return agentCallDataRepository.existsByCalldataid(id);
+    public boolean existsByCallDataId(String id, String agentid) {
+        return agentCallDataRepository.existsByCalldataidAndAgentid(id, agentid);
     }
 
     public List<AgentCallData> getAgentCallDataByCallDataID(String id) {

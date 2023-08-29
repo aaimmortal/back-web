@@ -13,7 +13,7 @@ public interface AgentCallDataRepository extends JpaRepository<AgentCallData, Lo
     AgentCallData findAgentCallDataByCalldataidAndDispositionEquals(String calldataid, String disposition);
     @Query("SELECT new com.example.webmorda_backend.model.DispositionCountByAccount(c.agentid,c.disposition,COUNT(*))FROM AgentCallData c GROUP BY c.agentid, c.disposition")
     List<DispositionCountByAccount> getDispositionCountByAccount();
-    boolean existsByCalldataid(String agentid);
+    boolean existsByCalldataidAndAgentid(String calldataid, String agentid);
     List<AgentCallData> findAgentCallDataByCalldataid(String calldataid);
 
 }
