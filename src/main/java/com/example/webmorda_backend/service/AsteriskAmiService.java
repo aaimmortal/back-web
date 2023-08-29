@@ -34,7 +34,7 @@ public class AsteriskAmiService {
                                 String status = dialEvent.getDialStatus();
                                 String calldataid = dialEvent.getUniqueId();
                                 AgentCallData agentCallData;
-                                if (!agentCallDataService.existsByCallDataId(calldataid)) {
+                                if (!agentCallDataService.existsByCallDataId(calldataid, agent)) {
                                     agentCallData = new AgentCallData();
                                     agentCallData.setAgentid(agent);
                                     agentCallData.setDisposition(status);
