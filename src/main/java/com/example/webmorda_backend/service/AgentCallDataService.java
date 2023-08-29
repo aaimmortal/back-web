@@ -29,7 +29,7 @@ public class AgentCallDataService {
         return agentCallDataRepository.existsByCalldataid(id);
     }
 
-    public AgentCallData getAgentCallDataByCallDataID(String id) {
+    public List<AgentCallData> getAgentCallDataByCallDataID(String id) {
         return agentCallDataRepository.findAgentCallDataByCalldataid(id);
     }
 }
