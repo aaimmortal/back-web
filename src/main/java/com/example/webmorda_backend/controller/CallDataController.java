@@ -49,6 +49,13 @@ public class CallDataController {
         }
     }
 
+    @GetMapping("/callData")
+    public ResponseEntity<?> callData(@RequestParam("callDataId") String callDataId) {
+        CallData callData = callDataService.getCallDataByUniqueId(callDataId);
+        if (callData == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No data");
+        return ResponseEntity.status(HttpStatus.OK).body(callData);
+    }
+
     @GetMapping("/dispositionCount")
     public ResponseEntity<?> getCountByDisposition() {
         List<DispositionCount> res = callDataService.getCountByDisposition();
