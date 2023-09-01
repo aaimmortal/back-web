@@ -19,6 +19,10 @@ public class CallDataService {
         return callDataRepository.getCallDataByCalldateBetween(dateTime, dateTime2);
     }
 
+    public void add(CallData callData) {
+        callDataRepository.save(callData);
+    }
+
     public CallData getCallDataByUniqueId(String id) {
         return callDataRepository.getCallDataByUniqueid(id);
     }

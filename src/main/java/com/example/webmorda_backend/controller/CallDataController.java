@@ -5,6 +5,7 @@ import com.example.webmorda_backend.entity.CallData;
 import com.example.webmorda_backend.model.DispositionCount;
 import com.example.webmorda_backend.model.DispositionCountByAccount;
 import com.example.webmorda_backend.service.AgentCallDataService;
+import com.example.webmorda_backend.service.AsteriskAmiService;
 import com.example.webmorda_backend.service.CallDataService;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
@@ -35,6 +36,7 @@ import java.util.zip.ZipOutputStream;
 public class CallDataController {
     CallDataService callDataService;
     AgentCallDataService agentCallDataService;
+    AsteriskAmiService asteriskAmiService;
 
     @GetMapping("/calldateBetween")
     public ResponseEntity<?> getCallDataBetween(@RequestParam("dateTime") String dateTime, @RequestParam("dateTime2") String dateTime2) {
