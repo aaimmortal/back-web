@@ -35,7 +35,7 @@ public class AsteriskAmiService {
                         callData.setCalldate(convertToLocalDateTimeViaInstant(monitorStartEvent.getDateReceived()));
                         callData.setLanguage(source.substring(0, 2));
                         callData.setSrc(source.substring(2));
-                        callData.setDisposition("NO ANSWER");
+                        callData.setDisposition("CANCEL");
                         callDataService.add(callData);
                     }
                     if (event instanceof DialEvent dialEvent) {
@@ -44,12 +44,13 @@ public class AsteriskAmiService {
                                 String agent = dialEvent.getDestination().substring(4, 8);
                                 String status = dialEvent.getDialStatus();
                                 String calldataid = dialEvent.getUniqueId();
-                                AgentCallData agentCallData;
-                                agentCallData = new AgentCallData();
-                                agentCallData.setAgentid(agent);
-                                agentCallData.setDisposition(status);
-                                agentCallData.setCalldataid(calldataid);
-                                agentCallDataService.add(agentCallData);
+                                if (!agentCallDataService.existsByCalldataidAndAgentidAndDisposition(calldataid, agent, status)) {
+                                    AgentCallData agentCallData = new AgentCallData();
+                                    agentCallData.setAgentid(agent);
+                                    agentCallData.setDisposition(status);
+                                    agentCallData.setCalldataid(calldataid);
+                                    agentCallDataService.add(agentCallData);
+                                }
                             }
                         }
                     }
