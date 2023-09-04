@@ -1,7 +1,7 @@
 package com.example.webmorda_backend.service;
 
 import com.example.webmorda_backend.entity.AgentCallData;
-import com.example.webmorda_backend.repository.AgentCallDataRepository;
+import com.example.webmorda_backend.entity.CallData;
 import lombok.AllArgsConstructor;
 import org.asteriskjava.manager.DefaultManagerConnection;
 import org.asteriskjava.manager.ManagerConnection;
@@ -9,6 +9,7 @@ import org.asteriskjava.manager.ManagerEventListener;
 import org.asteriskjava.manager.event.*;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -17,7 +18,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class AsteriskAmiService {
     AgentCallDataService agentCallDataService;
-    AgentCallDataRepository agentCallDataRepository;
+    CallDataService callDataService;
 
     public void subscribeToQueueEvents() {
         ManagerConnection amiConnection = new DefaultManagerConnection("172.16.3.185", "aster", "secret");
@@ -27,6 +28,16 @@ public class AsteriskAmiService {
                 @Override
                 public void onManagerEvent(ManagerEvent event) {
                     System.out.println(event);
+                    if (event instanceof MonitorStartEvent monitorStartEvent) {
+                        CallData callData = new CallData();
+                        String source = monitorStartEvent.getCallerIdNum();
+                        callData.setUniqueid(monitorStartEvent.getUniqueId());
+                        callData.setCalldate(convertToLocalDateTimeViaInstant(monitorStartEvent.getDateReceived()));
+                        callData.setLanguage(source.substring(0, 2));
+                        callData.setSrc(source.substring(2));
+                        callData.setDisposition("NO ANSWER");
+                        callDataService.add(callData);
+                    }
                     if (event instanceof DialEvent dialEvent) {
                         if (dialEvent.getSubEvent().equals("End")) {
                             if (dialEvent.getDialStatus() != null) {
@@ -34,27 +45,36 @@ public class AsteriskAmiService {
                                 String status = dialEvent.getDialStatus();
                                 String calldataid = dialEvent.getUniqueId();
                                 AgentCallData agentCallData;
-                                if (!agentCallDataService.existsByCallDataId(calldataid, agent)) {
-                                    agentCallData = new AgentCallData();
-                                    agentCallData.setAgentid(agent);
-                                    agentCallData.setDisposition(status);
-                                    agentCallData.setCalldataid(calldataid);
-                                    agentCallDataService.add(agentCallData);
-                                }
+                                agentCallData = new AgentCallData();
+                                agentCallData.setAgentid(agent);
+                                agentCallData.setDisposition(status);
+                                agentCallData.setCalldataid(calldataid);
+                                agentCallDataService.add(agentCallData);
                             }
                         }
                     }
                     if (event instanceof AgentConnectEvent agentConnectEvent) {
                         String id = agentConnectEvent.getLinkedId();
-                        AgentCallData agentCallData = agentCallDataService.getAgentCalldataByCalldataid(id);
-                        agentCallData.setConnect(convertToLocalDateTimeViaInstant(agentConnectEvent.getDateReceived()));
-                        agentCallDataService.add(agentCallData);
+                        CallData callData = callDataService.getCallDataByUniqueId(id);
+                        LocalDateTime start = convertToLocalDateTimeViaInstant(agentConnectEvent.getDateReceived());
+                        Duration waiting = Duration.between(callData.getCalldate(), start);
+                        callData.setConnect(start);
+                        callData.setWaiting((int) waiting.getSeconds());
+                        callData.setDst(agentConnectEvent.getMemberName().substring(4, 8));
+                        callData.setDisposition("ANSWERED");
+                        callDataService.add(callData);
                     }
                     if (event instanceof AgentCompleteEvent agentCompleteEvent) {
                         String id = agentCompleteEvent.getLinkedId();
-                        AgentCallData agentCallData = agentCallDataService.getAgentCalldataByCalldataid(id);
-                        agentCallData.setDisconnect(convertToLocalDateTimeViaInstant(agentCompleteEvent.getDateReceived()));
-                        agentCallDataService.add(agentCallData);
+                        CallData callData = callDataService.getCallDataByUniqueId(id);
+                        LocalDateTime finish = convertToLocalDateTimeViaInstant(agentCompleteEvent.getDateReceived());
+                        Duration dusrationConsult = Duration.between(callData.getConnect(), finish);
+                        Duration duration = Duration.between(callData.getCalldate(), finish);
+                        callData.setDuration((int) duration.getSeconds());
+                        callData.setDurationConsult((int) dusrationConsult.getSeconds());
+                        callData.setDisconnect(finish);
+                        callData.setAudio_path("/var/spool/asterisk/monitor/" + id + "-in.wav");
+                        callDataService.add(callData);
                     }
                 }
             });
