@@ -9,7 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.Date;
+
 
 @Entity
 @Data
@@ -32,4 +32,16 @@ public class CallData {
     private int duration;
     @Column(name = "audiopath")
     private String audio_path;
+    @Column(name = "connect")
+    private LocalDateTime connect;
+    @Column(name = "disconnect")
+    private LocalDateTime disconnect;
+    @Column(name = "rating")
+    private int rating;
+    @Column(name = "waiting")
+    private int waiting;
+    @Column(name = "durationconsult")
+    private int durationConsult;
+    @Column(name = "language")
+    String language;
 }

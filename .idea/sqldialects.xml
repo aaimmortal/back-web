@@ -3,7 +3,6 @@
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/src/main/resources/db.migration/V2__Create_init_table.sql" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/src/main/resources/db.migration/V3__Create_AgentCalldata_table.sql" dialect="MySQL" />
-    <file url="file://$PROJECT_DIR$/src/main/resources/db.migration/V4__AddConnectDisconnect_column.sql" dialect="MySQL" />
-    <file url="file://$PROJECT_DIR$/src/main/resources/db.migration/V5__AddRating_column.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/db.migration/V4__callData_column.sql" dialect="GenericSQL" />
   </component>
 </project>

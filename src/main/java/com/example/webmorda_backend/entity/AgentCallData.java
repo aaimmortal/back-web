@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+
 
 @Entity
 @Data
@@ -22,8 +22,4 @@ public class AgentCallData {
     private String agentid;
     @Column(name = "disposition")
     private String disposition;
-    @Column(name = "connect")
-    private LocalDateTime connect;
-    @Column(name = "disconnect")
-    private LocalDateTime disconnect;
 }
