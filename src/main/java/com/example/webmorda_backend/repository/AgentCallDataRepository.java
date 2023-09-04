@@ -10,10 +10,9 @@ import java.util.List;
 
 @Repository
 public interface AgentCallDataRepository extends JpaRepository<AgentCallData, Long> {
-    AgentCallData findAgentCallDataByCalldataidAndDispositionEquals(String calldataid, String disposition);
     @Query("SELECT new com.example.webmorda_backend.model.DispositionCountByAccount(c.agentid,c.disposition,COUNT(*))FROM AgentCallData c GROUP BY c.agentid, c.disposition")
     List<DispositionCountByAccount> getDispositionCountByAccount();
-    boolean existsByCalldataidAndAgentid(String calldataid, String agentid);
+    boolean existsByCalldataidAndAgentidAndDisposition(String calldataid, String agentid, String disposition);
     List<AgentCallData> findAgentCallDataByCalldataid(String calldataid);
 
 }

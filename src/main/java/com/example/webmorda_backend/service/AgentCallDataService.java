@@ -17,16 +17,12 @@ public class AgentCallDataService {
         agentCallDataRepository.save(agentCallData);
     }
 
-    public AgentCallData getAgentCalldataByCalldataid(String id) {
-        return agentCallDataRepository.findAgentCallDataByCalldataidAndDispositionEquals(id, "ANSWER");
-    }
-
     public List<DispositionCountByAccount> getDispositionCountByAccount() {
         return agentCallDataRepository.getDispositionCountByAccount();
     }
 
-    public boolean existsByCallDataId(String id, String agentid) {
-        return agentCallDataRepository.existsByCalldataidAndAgentid(id, agentid);
+    public boolean existsByCalldataidAndAgentidAndDisposition(String id, String agentid, String disposition) {
+        return agentCallDataRepository.existsByCalldataidAndAgentidAndDisposition(id, agentid, disposition);
     }
 
     public List<AgentCallData> getAgentCallDataByCallDataID(String id) {
