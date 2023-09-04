@@ -38,19 +38,25 @@ public class AsteriskAmiService {
                         callData.setDisposition("CANCEL");
                         callDataService.add(callData);
                     }
+                    if (event instanceof MonitorStopEvent monitorStopEvent) {
+                        String id = monitorStopEvent.getUniqueId();
+                        CallData callData = callDataService.getCallDataByUniqueId(id);
+                        LocalDateTime finish = convertToLocalDateTimeViaInstant(monitorStopEvent.getDateReceived());
+                        Duration duration = Duration.between(callData.getCalldate(), finish);
+                        callData.setDuration((int) duration.getSeconds());
+                        callDataService.add(callData);
+                    }
                     if (event instanceof DialEvent dialEvent) {
-                        if (dialEvent.getSubEvent().equals("End")) {
-                            if (dialEvent.getDialStatus() != null) {
-                                String agent = dialEvent.getDestination().substring(4, 8);
-                                String status = dialEvent.getDialStatus();
-                                String calldataid = dialEvent.getUniqueId();
-                                if (!agentCallDataService.existsByCalldataidAndAgentidAndDisposition(calldataid, agent, status)) {
-                                    AgentCallData agentCallData = new AgentCallData();
-                                    agentCallData.setAgentid(agent);
-                                    agentCallData.setDisposition(status);
-                                    agentCallData.setCalldataid(calldataid);
-                                    agentCallDataService.add(agentCallData);
-                                }
+                        if (dialEvent.getDialStatus() != null && dialEvent.getSubEvent().equals("End")) {
+                            String agent = dialEvent.getDestination().substring(4, 8);
+                            String status = dialEvent.getDialStatus();
+                            String calldataid = dialEvent.getUniqueId();
+                            if (!agentCallDataService.existsByCalldataidAndAgentidAndDisposition(calldataid, agent, status)) {
+                                AgentCallData agentCallData = new AgentCallData();
+                                agentCallData.setAgentid(agent);
+                                agentCallData.setDisposition(status);
+                                agentCallData.setCalldataid(calldataid);
+                                agentCallDataService.add(agentCallData);
                             }
                         }
                     }
@@ -70,8 +76,6 @@ public class AsteriskAmiService {
                         CallData callData = callDataService.getCallDataByUniqueId(id);
                         LocalDateTime finish = convertToLocalDateTimeViaInstant(agentCompleteEvent.getDateReceived());
                         Duration dusrationConsult = Duration.between(callData.getConnect(), finish);
-                        Duration duration = Duration.between(callData.getCalldate(), finish);
-                        callData.setDuration((int) duration.getSeconds());
                         callData.setDurationConsult((int) dusrationConsult.getSeconds());
                         callData.setDisconnect(finish);
                         callData.setAudio_path("/var/spool/asterisk/monitor/" + id + "-in.wav");
