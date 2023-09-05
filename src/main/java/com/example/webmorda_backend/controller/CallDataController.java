@@ -5,29 +5,21 @@ import com.example.webmorda_backend.entity.CallData;
 import com.example.webmorda_backend.model.DispositionCount;
 import com.example.webmorda_backend.model.DispositionCountByAccount;
 import com.example.webmorda_backend.service.AgentCallDataService;
-import com.example.webmorda_backend.service.AsteriskAmiService;
 import com.example.webmorda_backend.service.CallDataService;
 import lombok.AllArgsConstructor;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -36,7 +28,6 @@ import java.util.zip.ZipOutputStream;
 public class CallDataController {
     CallDataService callDataService;
     AgentCallDataService agentCallDataService;
-    AsteriskAmiService asteriskAmiService;
 
     @GetMapping("/calldateBetween")
     public ResponseEntity<?> getCallDataBetween(@RequestParam("dateTime") String dateTime, @RequestParam("dateTime2") String dateTime2) {
@@ -59,8 +50,17 @@ public class CallDataController {
     }
 
     @GetMapping("/dispositionCount")
-    public ResponseEntity<?> getCountByDisposition() {
-        List<DispositionCount> res = callDataService.getCountByDisposition();
+    public ResponseEntity<?> getCountByDisposition(@RequestParam("dateTime") String dateTime, @RequestParam("dateTime2") String dateTime2) {
+        LocalDateTime localDateTime1, localDateTime2;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        if (dateTime.equals("") && dateTime2.equals("")) {
+            localDateTime1 = LocalDateTime.MIN;
+            localDateTime2 = LocalDateTime.MAX;
+        } else {
+            localDateTime1 = LocalDateTime.parse(dateTime, formatter);
+            localDateTime2 = LocalDateTime.parse(dateTime2, formatter);
+        }
+        List<DispositionCount> res = callDataService.getCountByDisposition(localDateTime1, localDateTime2);
         if (res != null) {
             return ResponseEntity.status(HttpStatus.OK).body(res);
         } else {
@@ -100,35 +100,6 @@ public class CallDataController {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
-    }
-
-    @GetMapping("/getAudioBetween")
-    public ResponseEntity<?> getAudioBetween(@RequestParam("dateTime") String dateTime, @RequestParam("dateTime2") String dateTime2) throws IOException {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime localDateTime1 = LocalDateTime.parse(dateTime, formatter);
-        LocalDateTime localDateTime2 = LocalDateTime.parse(dateTime2, formatter);
-        List<CallData> res = callDataService.getCallDataByCalldateBetween(localDateTime1, localDateTime2);
-        if (res.size() == 0) {
-            return ResponseEntity.status(HttpStatus.OK).body("No data");
-        }
-        for (CallData re : res) {
-            if (!re.getAudio_path().equals("")) {
-                Path path = Paths.get(re.getAudio_path());
-                byte[] fileContent = Files.readAllBytes(path);
-                ZipEntry zipEntry = new ZipEntry(re.getAudio_path());
-                zipOutputStream.putNextEntry(zipEntry);
-                zipOutputStream.write(fileContent);
-                zipOutputStream.closeEntry();
-            }
-        }
-        zipOutputStream.close();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        byte[] zipBytes = byteArrayOutputStream.toByteArray();
-        ByteArrayResource resource = new ByteArrayResource(zipBytes);
-        return ResponseEntity.status(HttpStatus.OK).headers(headers).body(resource);
     }
 
     @GetMapping("/agentCallData")

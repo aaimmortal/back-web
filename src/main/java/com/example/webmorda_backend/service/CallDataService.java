@@ -27,8 +27,8 @@ public class CallDataService {
         return callDataRepository.getCallDataByUniqueid(id);
     }
 
-    public List<DispositionCount> getCountByDisposition() {
-        return callDataRepository.getCountByDisposition();
+    public List<DispositionCount> getCountByDisposition(LocalDateTime startDate, LocalDateTime endDate) {
+        return callDataRepository.getCountByDisposition(startDate, endDate);
     }
 
     public List<CallData> getAllCalldata() {
