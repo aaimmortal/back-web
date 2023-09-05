@@ -54,8 +54,8 @@ public class CallDataController {
         LocalDateTime localDateTime1, localDateTime2;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         if (dateTime.equals("") && dateTime2.equals("")) {
-            localDateTime1 = LocalDateTime.parse(LocalDateTime.MIN.format(formatter));
-            localDateTime2 = LocalDateTime.parse(LocalDateTime.MAX.format(formatter));
+            localDateTime1 = LocalDateTime.MIN;
+            localDateTime2 = LocalDateTime.now();
         } else {
             localDateTime1 = LocalDateTime.parse(dateTime, formatter);
             localDateTime2 = LocalDateTime.parse(dateTime2, formatter);
