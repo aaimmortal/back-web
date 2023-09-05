@@ -31,9 +31,15 @@ public class CallDataController {
 
     @GetMapping("/calldateBetween")
     public ResponseEntity<?> getCallDataBetween(@RequestParam("dateTime") String dateTime, @RequestParam("dateTime2") String dateTime2) {
+        LocalDateTime localDateTime1, localDateTime2;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime localDateTime1 = LocalDateTime.parse(dateTime, formatter);
-        LocalDateTime localDateTime2 = LocalDateTime.parse(dateTime2, formatter);
+        if (dateTime.equals("") && dateTime2.equals("")) {
+            localDateTime1 = LocalDateTime.MIN;
+            localDateTime2 = LocalDateTime.now();
+        } else {
+            localDateTime1 = LocalDateTime.parse(dateTime, formatter);
+            localDateTime2 = LocalDateTime.parse(dateTime2, formatter);
+        }
         List<CallData> res = callDataService.getCallDataByCalldateBetween(localDateTime1, localDateTime2);
         if (res != null) {
             return ResponseEntity.status(HttpStatus.OK).body(res);
@@ -61,16 +67,6 @@ public class CallDataController {
             localDateTime2 = LocalDateTime.parse(dateTime2, formatter);
         }
         List<DispositionCount> res = callDataService.getCountByDisposition(localDateTime1, localDateTime2);
-        if (res != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(res);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No data");
-        }
-    }
-
-    @GetMapping("/getAllCalldata")
-    public ResponseEntity<?> getAllCalldata() {
-        List<CallData> res = callDataService.getAllCalldata();
         if (res != null) {
             return ResponseEntity.status(HttpStatus.OK).body(res);
         } else {
