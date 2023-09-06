@@ -72,8 +72,9 @@ public class CallDataController {
     }
 
     @GetMapping("/dispositionCountByAccount")
-    public ResponseEntity<?> getDispositionCountByAccount() {
-        List<DispositionCountByAccount> res = agentCallDataService.getDispositionCountByAccount();
+    public ResponseEntity<?> getDispositionCountByAccount(@RequestParam("dateTime") String dateTime, @RequestParam("dateTime2") String dateTime2) {
+        LocalDateTime[] range = getRange(dateTime, dateTime2);
+        List<DispositionCountByAccount> res = agentCallDataService.getDispositionCountByAccount(range[0], range[1]);
         if (res != null) {
             return ResponseEntity.status(HttpStatus.OK).body(res);
         } else {
