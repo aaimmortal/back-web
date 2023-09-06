@@ -29,8 +29,7 @@ public class CallDataController {
     CallDataService callDataService;
     AgentCallDataService agentCallDataService;
 
-    @GetMapping("/calldateBetween")
-    public ResponseEntity<?> getCallDataBetween(@RequestParam("dateTime") String dateTime, @RequestParam("dateTime2") String dateTime2) {
+    public LocalDateTime[] getRange(String dateTime, String dateTime2) {
         LocalDateTime localDateTime1, localDateTime2;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         if (dateTime.equals("") && dateTime2.equals("")) {
@@ -40,7 +39,13 @@ public class CallDataController {
             localDateTime1 = LocalDateTime.parse(dateTime, formatter);
             localDateTime2 = LocalDateTime.parse(dateTime2, formatter);
         }
-        List<CallData> res = callDataService.getCallDataByCalldateBetween(localDateTime1, localDateTime2);
+        return new LocalDateTime[]{localDateTime1, localDateTime2};
+    }
+
+    @GetMapping("/calldateBetween")
+    public ResponseEntity<?> getCallDataBetween(@RequestParam("dateTime") String dateTime, @RequestParam("dateTime2") String dateTime2) {
+        LocalDateTime[] range = getRange(dateTime, dateTime2);
+        List<CallData> res = callDataService.getCallDataByCalldateBetween(range[0], range[1]);
         if (res != null) {
             return ResponseEntity.status(HttpStatus.OK).body(res);
         } else {
@@ -57,16 +62,8 @@ public class CallDataController {
 
     @GetMapping("/dispositionCount")
     public ResponseEntity<?> getCountByDisposition(@RequestParam("dateTime") String dateTime, @RequestParam("dateTime2") String dateTime2) {
-        LocalDateTime localDateTime1, localDateTime2;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        if (dateTime.equals("") && dateTime2.equals("")) {
-            localDateTime1 = LocalDateTime.MIN;
-            localDateTime2 = LocalDateTime.now();
-        } else {
-            localDateTime1 = LocalDateTime.parse(dateTime, formatter);
-            localDateTime2 = LocalDateTime.parse(dateTime2, formatter);
-        }
-        List<DispositionCount> res = callDataService.getCountByDisposition(localDateTime1, localDateTime2);
+        LocalDateTime[] range = getRange(dateTime, dateTime2);
+        List<DispositionCount> res = callDataService.getCountByDisposition(range[0], range[1]);
         if (res != null) {
             return ResponseEntity.status(HttpStatus.OK).body(res);
         } else {
