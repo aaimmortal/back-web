@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 
 @Entity
@@ -22,4 +23,6 @@ public class AgentCallData {
     private String agentid;
     @Column(name = "disposition")
     private String disposition;
+    @Column(name = "calldate")
+    LocalDateTime calldate;
 }

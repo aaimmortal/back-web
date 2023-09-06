@@ -6,6 +6,7 @@ import com.example.webmorda_backend.repository.AgentCallDataRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -17,8 +18,8 @@ public class AgentCallDataService {
         agentCallDataRepository.save(agentCallData);
     }
 
-    public List<DispositionCountByAccount> getDispositionCountByAccount() {
-        return agentCallDataRepository.getDispositionCountByAccount();
+    public List<DispositionCountByAccount> getDispositionCountByAccount(LocalDateTime startDate, LocalDateTime endDate) {
+        return agentCallDataRepository.getDispositionCountByAccount(startDate, endDate);
     }
 
     public boolean existsByCalldataidAndAgentidAndDisposition(String id, String agentid, String disposition) {
