@@ -45,5 +45,5 @@ public class CallData {
     @Column(name = "language")
     String language;
     @Column(name = "dropped")
-    int dropped;
+    Integer dropped;
 }
