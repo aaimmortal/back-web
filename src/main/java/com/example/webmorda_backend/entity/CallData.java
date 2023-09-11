@@ -44,4 +44,6 @@ public class CallData {
     private int durationConsult;
     @Column(name = "language")
     String language;
+    @Column(name = "dropped")
+    int dropped;
 }

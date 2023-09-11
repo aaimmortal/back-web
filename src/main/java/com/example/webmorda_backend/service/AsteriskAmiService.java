@@ -81,6 +81,12 @@ public class AsteriskAmiService {
                         callData.setAudio_path("/var/spool/asterisk/monitor/" + id + "-in.wav");
                         callDataService.add(callData);
                     }
+                    if (event instanceof QueueCallerAbandonEvent queueCallerAbandonEvent) {
+                        String id = queueCallerAbandonEvent.getLinkedId();
+                        CallData callData = callDataService.getCallDataByUniqueId(id);
+                        callData.setDisposition("NO ANSWER");
+                        callDataService.add(callData);
+                    }
                 }
             });
         } catch (Exception e) {
