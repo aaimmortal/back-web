@@ -49,15 +49,17 @@ public class AsteriskAmiService {
                             String agent = dialEvent.getDestination().substring(4, 8);
                             String status = dialEvent.getDialStatus();
                             String calldataid = dialEvent.getUniqueId();
-                            if (!agentCallDataService.existsByCalldataidAndAgentidAndDisposition(calldataid, agent, status)) {
-                                AgentCallData agentCallData = new AgentCallData();
-                                CallData callData = callDataService.getCallDataByUniqueId(calldataid);
-                                agentCallData.setCalldate(callData.getCalldate());
-                                agentCallData.setAgentid(agent);
-                                agentCallData.setDisposition(status);
-                                agentCallData.setCalldataid(calldataid);
-                                agentCallDataService.add(agentCallData);
+                            if (!agentCallDataService.existsByCalldataidAndAgentidAndDisposition(calldataid, agent, status) && !(status.equals("NOANSWER") || status.equals("CANCEL"))) {
+                                addNewAgenCallData(calldataid, agent, status);
                             }
+                        }
+                    }
+                    if (event instanceof AgentRingNoAnswerEvent agentRingNoAnswerEvent) {
+                        String agent = agentRingNoAnswerEvent.getInterface().substring(4, 8);
+                        String status = "NOANSWER";
+                        String calldataid = agentRingNoAnswerEvent.getUniqueId();
+                        if (!agentCallDataService.existsByCalldataidAndAgentidAndDisposition(calldataid, agent, status) ) {
+                            addNewAgenCallData(calldataid, agent, status);
                         }
                     }
                     if (event instanceof AgentConnectEvent agentConnectEvent) {
@@ -92,6 +94,16 @@ public class AsteriskAmiService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void addNewAgenCallData(String calldataid, String agent, String status) {
+        AgentCallData agentCallData = new AgentCallData();
+        CallData callData = callDataService.getCallDataByUniqueId(calldataid);
+        agentCallData.setCalldate(callData.getCalldate());
+        agentCallData.setAgentid(agent);
+        agentCallData.setDisposition(status);
+        agentCallData.setCalldataid(calldataid);
+        agentCallDataService.add(agentCallData);
     }
 
     public LocalDateTime convertToLocalDateTimeViaInstant(Date dateToConvert) {
