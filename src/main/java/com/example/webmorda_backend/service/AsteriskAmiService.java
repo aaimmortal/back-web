@@ -2,6 +2,7 @@ package com.example.webmorda_backend.service;
 
 import com.example.webmorda_backend.entity.AgentCallData;
 import com.example.webmorda_backend.entity.CallData;
+import com.example.webmorda_backend.entity.Wfm;
 import lombok.AllArgsConstructor;
 import org.asteriskjava.manager.DefaultManagerConnection;
 import org.asteriskjava.manager.ManagerConnection;
@@ -17,15 +18,40 @@ import java.util.Date;
 public class AsteriskAmiService {
     AgentCallDataService agentCallDataService;
     CallDataService callDataService;
+    WfmService wfmService;
 
     public void subscribeToQueueEvents() {
         ManagerConnection amiConnection = new DefaultManagerConnection("172.16.3.185", "aster", "secret");
+
         try {
             amiConnection.login();
             amiConnection.addEventListener(new ManagerEventListener() {
                 @Override
                 public void onManagerEvent(ManagerEvent event) {
-                    System.out.println(event);
+                    System.out.println(event.toString());
+                    if (event instanceof PeerStatusEvent peerStatusEvent) {
+                        String address = peerStatusEvent.getAddress();
+                        String agentID = peerStatusEvent.getPeer().substring(4, 8);
+                        String status = peerStatusEvent.getPeerStatus();
+                        Date date = peerStatusEvent.getDateReceived();
+                        LocalDateTime localDateTime = convertToLocalDateTimeViaInstant(date);
+                        if (status.equals("Unregistered")) {
+                            Wfm wfm = new Wfm();
+                            wfm.setAgentid(agentID);
+                            wfm.setAction("Logout");
+                            wfm.setAddress(address);
+                            wfm.setDate(localDateTime);
+                            wfmService.addWfm(wfm);
+                        }
+                        else if (!wfmService.existsByAgentidAndAddress(agentID, address)) {
+                            Wfm wfm = new Wfm();
+                            wfm.setAgentid(agentID);
+                            wfm.setAction("Login");
+                            wfm.setAddress(address);
+                            wfm.setDate(localDateTime);
+                            wfmService.addWfm(wfm);
+                        }
+                    }
                     if (event instanceof MonitorStartEvent monitorStartEvent) {
                         CallData callData = new CallData();
                         String source = monitorStartEvent.getCallerIdNum();
@@ -33,7 +59,7 @@ public class AsteriskAmiService {
                         callData.setCalldate(convertToLocalDateTimeViaInstant(monitorStartEvent.getDateReceived()));
                         callData.setLanguage(source.substring(0, 2));
                         callData.setSrc(source.substring(2));
-                        callData.setDisposition("CANCEL");
+                        callData.setDisposition("NO ANSWER");
                         callDataService.add(callData);
                     }
                     if (event instanceof MonitorStopEvent monitorStopEvent) {
@@ -58,7 +84,7 @@ public class AsteriskAmiService {
                         String agent = agentRingNoAnswerEvent.getInterface().substring(4, 8);
                         String status = "NOANSWER";
                         String calldataid = agentRingNoAnswerEvent.getUniqueId();
-                        if (!agentCallDataService.existsByCalldataidAndAgentidAndDisposition(calldataid, agent, status) ) {
+                        if (!agentCallDataService.existsByCalldataidAndAgentidAndDisposition(calldataid, agent, status)) {
                             addNewAgenCallData(calldataid, agent, status);
                         }
                     }
@@ -77,8 +103,8 @@ public class AsteriskAmiService {
                         String id = agentCompleteEvent.getLinkedId();
                         CallData callData = callDataService.getCallDataByUniqueId(id);
                         LocalDateTime finish = convertToLocalDateTimeViaInstant(agentCompleteEvent.getDateReceived());
-                        Duration dusrationConsult = Duration.between(callData.getConnect(), finish);
-                        callData.setDurationConsult((int) dusrationConsult.getSeconds());
+                        Duration durationConsult = Duration.between(callData.getConnect(), finish);
+                        callData.setDurationConsult((int) durationConsult.getSeconds());
                         callData.setDisconnect(finish);
                         callData.setAudio_path("/var/spool/asterisk/monitor/" + id + "-in.wav");
                         callDataService.add(callData);
@@ -86,7 +112,7 @@ public class AsteriskAmiService {
                     if (event instanceof QueueCallerAbandonEvent queueCallerAbandonEvent) {
                         String id = queueCallerAbandonEvent.getLinkedId();
                         CallData callData = callDataService.getCallDataByUniqueId(id);
-                        callData.setDisposition("NO ANSWER");
+                        callData.setDisposition("CANCEL");
                         callDataService.add(callData);
                     }
                 }
