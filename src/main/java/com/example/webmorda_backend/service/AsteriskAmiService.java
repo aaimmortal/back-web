@@ -35,7 +35,7 @@ public class AsteriskAmiService {
                         String status = peerStatusEvent.getPeerStatus();
                         Date date = peerStatusEvent.getDateReceived();
                         LocalDateTime localDateTime = convertToLocalDateTimeViaInstant(date);
-                        if (status.equals("Unregistered")) {
+                        if (status.equals("Unregistered") && !wfmService.findTopByAgentidOrderByDate(agentID).getAction().equals("Logout")) {
                             Wfm wfm = new Wfm();
                             wfm.setAgentid(agentID);
                             wfm.setAction("Logout");

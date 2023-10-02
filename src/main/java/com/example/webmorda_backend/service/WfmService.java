@@ -24,4 +24,8 @@ public class WfmService {
     public List<Wfm> findAll() {
         return wfmRepository.findAll();
     }
+
+    Wfm findTopByAgentidOrderByDate(String agentid) {
+        return wfmRepository.findTopByAgentidOrderByDate(agentid);
+    }
 }
