@@ -22,13 +22,25 @@ public class AsteriskAmiService {
 
     public void subscribeToQueueEvents() {
         ManagerConnection amiConnection = new DefaultManagerConnection("172.16.3.185", "aster", "secret");
-
         try {
             amiConnection.login();
             amiConnection.addEventListener(new ManagerEventListener() {
                 @Override
                 public void onManagerEvent(ManagerEvent event) {
                     System.out.println(event.toString());
+                    if (event instanceof VarSetEvent varSetEvent) {
+                        String variable = varSetEvent.getVariable();
+                        String value = varSetEvent.getValue();
+                        String agentId = varSetEvent.getCallerIdNum();
+                        LocalDateTime localDateTime = convertToLocalDateTimeViaInstant(varSetEvent.getDateReceived());
+                        if ((variable.equals("PQMSTATUS") && value.equals("PAUSED")) || variable.equals("UPQMSTATUS") && value.equals("UNPAUSED")) {
+                            Wfm wfm = new Wfm();
+                            wfm.setAgentid(agentId);
+                            wfm.setDate(localDateTime);
+                            wfm.setAction(value);
+                            wfmService.addWfm(wfm);
+                        }
+                    }
                     if (event instanceof PeerStatusEvent peerStatusEvent) {
                         String address = peerStatusEvent.getAddress();
                         String agentID = peerStatusEvent.getPeer().substring(4, 8);
@@ -42,8 +54,7 @@ public class AsteriskAmiService {
                             wfm.setAddress(address);
                             wfm.setDate(localDateTime);
                             wfmService.addWfm(wfm);
-                        }
-                        else if (!wfmService.existsByAgentidAndAddress(agentID, address)) {
+                        } else if (!wfmService.existsByAgentidAndAddress(agentID, address)) {
                             Wfm wfm = new Wfm();
                             wfm.setAgentid(agentID);
                             wfm.setAction("Login");
