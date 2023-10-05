@@ -36,7 +36,7 @@ public class AsteriskAmiService {
                         if ((variable.equals("PQMSTATUS") && value.equals("PAUSED")) || variable.equals("UPQMSTATUS") && value.equals("UNPAUSED")) {
                             Wfm lastWfmByAgent = wfmService.findTopByAgentidOrderByDateDesc(agentId);
                             String lastAction = lastWfmByAgent.getAction();
-                            if (!lastAction.equals(variable)) {
+                            if (!lastAction.equals(value)) {
                                 Wfm wfm = new Wfm();
                                 wfm.setAgentid(agentId);
                                 wfm.setDate(localDateTime);
