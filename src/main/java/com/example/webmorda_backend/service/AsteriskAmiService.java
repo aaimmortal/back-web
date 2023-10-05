@@ -34,7 +34,7 @@ public class AsteriskAmiService {
                         String agentId = varSetEvent.getCallerIdNum();
                         LocalDateTime localDateTime = convertToLocalDateTimeViaInstant(varSetEvent.getDateReceived());
                         if ((variable.equals("PQMSTATUS") && value.equals("PAUSED")) || variable.equals("UPQMSTATUS") && value.equals("UNPAUSED")) {
-                            Wfm lastWfmByAgent = wfmService.findTopByAgentidOrderByDate(agentId);
+                            Wfm lastWfmByAgent = wfmService.findTopByAgentidOrderByDateDesc(agentId);
                             String lastAction = lastWfmByAgent.getAction();
                             if (!lastAction.equals(variable)) {
                                 Wfm wfm = new Wfm();
@@ -51,7 +51,7 @@ public class AsteriskAmiService {
                         String status = peerStatusEvent.getPeerStatus();
                         Date date = peerStatusEvent.getDateReceived();
                         LocalDateTime localDateTime = convertToLocalDateTimeViaInstant(date);
-                        if (status.equals("Unregistered") && !wfmService.findTopByAgentidOrderByDate(agentID).getAction().equals("Logout")) {
+                        if (status.equals("Unregistered")) {
                             Wfm wfm = new Wfm();
                             wfm.setAgentid(agentID);
                             wfm.setAction("Logout");

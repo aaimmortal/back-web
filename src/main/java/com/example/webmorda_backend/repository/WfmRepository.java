@@ -11,7 +11,7 @@ import java.util.List;
 public interface WfmRepository extends JpaRepository<Wfm, Long> {
 
     boolean existsByAgentidAndAddress(String agentid, String address);
-    Wfm findTopByAgentidOrderByDate(String agentid);
+    Wfm findTopByAgentidOrderByDateDesc(String agentid);
     List<Wfm> getWfmByDateBetween(LocalDateTime date, LocalDateTime date2);
 
 }
