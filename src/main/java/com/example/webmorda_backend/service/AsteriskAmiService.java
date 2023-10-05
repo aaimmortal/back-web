@@ -42,8 +42,8 @@ public class AsteriskAmiService {
                                 wfm.setDate(localDateTime);
                                 wfm.setAction(value);
                                 Wfm last = wfmService.getWfmByAgentidAndActionEqualsOrderByDateDesc(agentId, "PAUSED");
-                                Duration duration = Duration.between(last.getDate(), localDateTime);
-                                if (value.equals("UNPAUSED")) {
+                                if (last != null && value.equals("UNPAUSED")) {
+                                    Duration duration = Duration.between(last.getDate(), localDateTime);
                                     wfm.setPausedDuration((int) duration.getSeconds());
                                 }
                                 wfmService.addWfm(wfm);
