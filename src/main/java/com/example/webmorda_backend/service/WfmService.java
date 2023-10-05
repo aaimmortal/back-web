@@ -26,8 +26,8 @@ public class WfmService {
         return wfmRepository.findAll();
     }
 
-    Wfm findTopByAgentidOrderByDate(String agentid) {
-        return wfmRepository.findTopByAgentidOrderByDate(agentid);
+    Wfm findTopByAgentidOrderByDateDesc(String agentid) {
+        return wfmRepository.findTopByAgentidOrderByDateDesc(agentid);
     }
 
     public List<Wfm> getWfmByDateBetween(LocalDateTime date, LocalDateTime date2) {
