@@ -24,4 +24,6 @@ public class Wfm {
     String action;
     @Column(name = "address")
     String address;
+    @Column(name = "pausedduration")
+    int pausedDuration;
 }
