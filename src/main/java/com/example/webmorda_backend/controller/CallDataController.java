@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @CrossOrigin(origins = "*")
@@ -29,22 +28,9 @@ public class CallDataController {
     CallDataService callDataService;
     AgentCallDataService agentCallDataService;
 
-    public LocalDateTime[] getRange(String dateTime, String dateTime2) {
-        LocalDateTime localDateTime1, localDateTime2;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        if (dateTime.equals("") && dateTime2.equals("")) {
-            localDateTime1 = LocalDateTime.MIN;
-            localDateTime2 = LocalDateTime.now();
-        } else {
-            localDateTime1 = LocalDateTime.parse(dateTime, formatter);
-            localDateTime2 = LocalDateTime.parse(dateTime2, formatter);
-        }
-        return new LocalDateTime[]{localDateTime1, localDateTime2};
-    }
-
     @GetMapping("/calldateBetween")
     public ResponseEntity<?> getCallDataBetween(@RequestParam("dateTime") String dateTime, @RequestParam("dateTime2") String dateTime2) {
-        LocalDateTime[] range = getRange(dateTime, dateTime2);
+        LocalDateTime[] range = callDataService.getRange(dateTime, dateTime2);
         List<CallData> res = callDataService.getCallDataByCalldateBetween(range[0], range[1]);
         if (res != null) {
             return ResponseEntity.status(HttpStatus.OK).body(res);
@@ -62,7 +48,7 @@ public class CallDataController {
 
     @GetMapping("/dispositionCount")
     public ResponseEntity<?> getCountByDisposition(@RequestParam("dateTime") String dateTime, @RequestParam("dateTime2") String dateTime2) {
-        LocalDateTime[] range = getRange(dateTime, dateTime2);
+        LocalDateTime[] range = callDataService.getRange(dateTime, dateTime2);
         List<DispositionCount> res = callDataService.getCountByDisposition(range[0], range[1]);
         if (res != null) {
             return ResponseEntity.status(HttpStatus.OK).body(res);
@@ -73,7 +59,7 @@ public class CallDataController {
 
     @GetMapping("/dispositionCountByAccount")
     public ResponseEntity<?> getDispositionCountByAccount(@RequestParam("dateTime") String dateTime, @RequestParam("dateTime2") String dateTime2) {
-        LocalDateTime[] range = getRange(dateTime, dateTime2);
+        LocalDateTime[] range = callDataService.getRange(dateTime, dateTime2);
         List<DispositionCountByAccount> res = agentCallDataService.getDispositionCountByAccount(range[0], range[1]);
         if (res != null) {
             return ResponseEntity.status(HttpStatus.OK).body(res);
