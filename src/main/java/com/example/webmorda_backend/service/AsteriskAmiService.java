@@ -34,11 +34,15 @@ public class AsteriskAmiService {
                         String agentId = varSetEvent.getCallerIdNum();
                         LocalDateTime localDateTime = convertToLocalDateTimeViaInstant(varSetEvent.getDateReceived());
                         if ((variable.equals("PQMSTATUS") && value.equals("PAUSED")) || variable.equals("UPQMSTATUS") && value.equals("UNPAUSED")) {
-                            Wfm wfm = new Wfm();
-                            wfm.setAgentid(agentId);
-                            wfm.setDate(localDateTime);
-                            wfm.setAction(value);
-                            wfmService.addWfm(wfm);
+                            Wfm lastWfmByAgent = wfmService.findTopByAgentidOrderByDate(agentId);
+                            String lastAction = lastWfmByAgent.getAction();
+                            if (!lastAction.equals(variable)) {
+                                Wfm wfm = new Wfm();
+                                wfm.setAgentid(agentId);
+                                wfm.setDate(localDateTime);
+                                wfm.setAction(value);
+                                wfmService.addWfm(wfm);
+                            }
                         }
                     }
                     if (event instanceof PeerStatusEvent peerStatusEvent) {
