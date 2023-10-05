@@ -7,8 +7,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @AllArgsConstructor
@@ -33,6 +33,18 @@ public class CallDataService {
 
     public List<CallData> getAllCalldata() {
         return callDataRepository.findAll();
+    }
+    public LocalDateTime[] getRange(String dateTime, String dateTime2) {
+        LocalDateTime localDateTime1, localDateTime2;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        if (dateTime.equals("") && dateTime2.equals("")) {
+            localDateTime1 = LocalDateTime.MIN;
+            localDateTime2 = LocalDateTime.now();
+        } else {
+            localDateTime1 = LocalDateTime.parse(dateTime, formatter);
+            localDateTime2 = LocalDateTime.parse(dateTime2, formatter);
+        }
+        return new LocalDateTime[]{localDateTime1, localDateTime2};
     }
 
 }

@@ -6,6 +6,7 @@ import com.example.webmorda_backend.repository.WfmRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -27,5 +28,9 @@ public class WfmService {
 
     Wfm findTopByAgentidOrderByDate(String agentid) {
         return wfmRepository.findTopByAgentidOrderByDate(agentid);
+    }
+
+    public List<Wfm> getWfmByDateBetween(LocalDateTime date, LocalDateTime date2) {
+        return wfmRepository.getWfmByDateBetween(date, date2);
     }
 }
