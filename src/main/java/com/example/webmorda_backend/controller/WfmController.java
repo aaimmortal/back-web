@@ -21,10 +21,6 @@ public class WfmController {
 
     @GetMapping("/wfm")
     public ResponseEntity<?> getWfm(@RequestParam("dateTime") String dateTime, @RequestParam("dateTime2") String dateTime2) {
-        return getResponseEntity(dateTime, dateTime2);
-    }
-
-    private ResponseEntity<?> getResponseEntity(@RequestParam("dateTime") String dateTime, @RequestParam("dateTime2") String dateTime2) {
         LocalDateTime[] range = callDataService.getRange(dateTime, dateTime2);
         List<Wfm> res = wfmService.getWfmByDateBetween(range[0], range[1]);
         if (res != null) {
@@ -35,9 +31,15 @@ public class WfmController {
     }
 
     @GetMapping("/wfmGraph")
-    public ResponseEntity<?> getWfm(@RequestParam("date") String date) {
+    public ResponseEntity<?> wfmGraph(@RequestParam("date") String date, @RequestParam("agentid") String agentid) {
         String dateTime = date + " 00:00:00";
         String dateTime2 = dateTime + " 23:59:59";
-        return getResponseEntity(dateTime, dateTime2);
+        LocalDateTime[] range = callDataService.getRange(dateTime, dateTime2);
+        List<Wfm> res = wfmService.getWfmByDateBetweenAndAgentidEquals(range[0], range[1], agentid);
+        if (res != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(res);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No data");
+        }
     }
 }

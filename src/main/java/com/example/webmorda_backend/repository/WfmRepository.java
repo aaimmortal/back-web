@@ -14,5 +14,6 @@ public interface WfmRepository extends JpaRepository<Wfm, Long> {
     Wfm findTopByAgentidOrderByDateDesc(String agentid);
     Wfm getWfmByAgentidAndActionEqualsOrderByDateDesc(String agentid, String action);
     List<Wfm> getWfmByDateBetween(LocalDateTime date, LocalDateTime date2);
+    List<Wfm> getWfmByDateBetweenAndAgentidEquals(LocalDateTime date, LocalDateTime date2, String agentid);
 
 }
