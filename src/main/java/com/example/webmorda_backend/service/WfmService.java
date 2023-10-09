@@ -38,6 +38,6 @@ public class WfmService {
         return wfmRepository.getWfmByDateBetween(date, date2);
     }
     public List<Wfm> getWfmByDateBetweenAndAgentidEquals(LocalDateTime date, LocalDateTime date2, String agentid) {
-        return getWfmByDateBetweenAndAgentidEquals(date, date2, agentid);
+        return wfmRepository.getWfmByDateBetweenAndAgentidEquals(date, date2, agentid);
     }
 }
