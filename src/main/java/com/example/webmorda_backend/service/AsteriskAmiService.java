@@ -34,18 +34,20 @@ public class AsteriskAmiService {
                         String agentId = varSetEvent.getCallerIdNum();
                         LocalDateTime localDateTime = convertToLocalDateTimeViaInstant(varSetEvent.getDateReceived());
                         if ((variable.equals("PQMSTATUS") && value.equals("PAUSED")) || variable.equals("UPQMSTATUS") && value.equals("UNPAUSED")) {
-                            Wfm lastWfmByAgent = wfmService.findTopByAgentidOrderByDateDesc(agentId);
-                            String lastAction = lastWfmByAgent.getAction();
-                            if (!lastAction.equals(value)) {
+                            if (value.equals("PAUSED")){
                                 Wfm wfm = new Wfm();
                                 wfm.setAgentid(agentId);
                                 wfm.setDate(localDateTime);
                                 wfm.setAction(value);
+                                wfmService.addWfm(wfm);
+                            } else {
                                 Wfm last = wfmService.getWfmByAgentidAndActionEqualsOrderByDateDesc(agentId, "PAUSED");
-                                if (last != null && value.equals("UNPAUSED")) {
-                                    Duration duration = Duration.between(last.getDate(), localDateTime);
-                                    wfm.setPausedDuration((int) duration.getSeconds());
-                                }
+                                Wfm wfm = new Wfm();
+                                wfm.setAgentid(agentId);
+                                wfm.setDate(localDateTime);
+                                wfm.setAction(value);
+                                Duration duration = Duration.between(last.getDate(), localDateTime);
+                                wfm.setPausedDuration((int) duration.getSeconds());
                                 wfmService.addWfm(wfm);
                             }
                         }
