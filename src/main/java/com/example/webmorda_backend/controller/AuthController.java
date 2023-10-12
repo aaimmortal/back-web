@@ -74,7 +74,7 @@ public class AuthController {
     @GetMapping("/agents")
     private ResponseEntity<?> getAgents(){
         List<String> agents = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("/etc/asterisk/sip.conf"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("../etc/asterisk/sip.conf"))) {
             String line;
             String currentAgent = null;
             while ((line = br.readLine()) != null) {
