@@ -17,6 +17,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,5 +69,31 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with this login exists");
         }
         return ResponseEntity.status(HttpStatus.CREATED).body("User created");
+    }
+
+    @GetMapping("/agents")
+    private ResponseEntity<?> getAgents(){
+        List<String> agents = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader("/etc/asterisk/sip.conf"))) {
+            String line;
+            String currentAgent = null;
+            while ((line = br.readLine()) != null) {
+                if (line.startsWith("[")) {
+                    currentAgent = line.substring(1, line.indexOf("]"));
+                } else if (currentAgent != null) {
+                    String[] parts = line.split("=");
+                    if (parts.length == 2) {
+                        String key = parts[0].trim();
+                        String value = parts[1].trim();
+                        if (key.equals("username")) {
+                            agents.add("Agent: " + currentAgent + ", Username: " + value);
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(agents);
     }
 }
