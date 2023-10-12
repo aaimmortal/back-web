@@ -81,15 +81,7 @@ public class AuthController {
                 System.out.println(line);
                 if (line.startsWith("[")) {
                     currentAgent = line.substring(1, line.indexOf("]"));
-                } else if (currentAgent != null) {
-                    String[] parts = line.split("=");
-                    if (parts.length == 2) {
-                        String key = parts[0].trim();
-                        String value = parts[1].trim();
-                        if (key.equals("username")) {
-                            agents.add("Agent: " + currentAgent + ", Username: " + value);
-                        }
-                    }
+                    agents.add(currentAgent);
                 }
             }
         } catch (IOException e) {
