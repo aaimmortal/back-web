@@ -74,10 +74,11 @@ public class AuthController {
     @GetMapping("/agents")
     private ResponseEntity<?> getAgents(){
         List<String> agents = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("../etc/asterisk/sip.conf"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("/etc/asterisk/sip.conf"))) {
             String line;
             String currentAgent = null;
             while ((line = br.readLine()) != null) {
+                System.out.println(line);
                 if (line.startsWith("[")) {
                     currentAgent = line.substring(1, line.indexOf("]"));
                 } else if (currentAgent != null) {
