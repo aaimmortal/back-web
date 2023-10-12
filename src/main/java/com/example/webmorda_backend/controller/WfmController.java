@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin(origins = "*")
@@ -31,15 +32,15 @@ public class WfmController {
     }
 
     @GetMapping("/wfmGraph")
-    public ResponseEntity<?> wfmGraph(@RequestParam("date") String date, @RequestParam("agentid") String agentid) {
+    public ResponseEntity<?> wfmGraph(@RequestParam("date") String date, @RequestParam("agentids") List<String> agentids) {
         String dateTime = date + " 00:00:00";
         String dateTime2 = date + " 23:59:59";
         LocalDateTime[] range = callDataService.getRange(dateTime, dateTime2);
-        List<Wfm> res = wfmService.getWfmByDateBetweenAndAgentidEquals(range[0], range[1], agentid);
-        if (res != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(res);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No data");
+        List<List<Wfm>> res = new ArrayList<>();
+        for (String agentid: agentids) {
+            List<Wfm> temp = wfmService.getWfmByDateBetweenAndAgentidEquals(range[0], range[1], agentid);
+            res.add(temp);
         }
+        return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 }
