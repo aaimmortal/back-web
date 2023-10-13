@@ -2,6 +2,7 @@ package com.example.webmorda_backend.controller;
 
 import com.example.webmorda_backend.entity.Role;
 import com.example.webmorda_backend.entity.User;
+import com.example.webmorda_backend.model.AgentRequest;
 import com.example.webmorda_backend.payload.AuthRequest;
 import com.example.webmorda_backend.payload.RegisterRequest;
 import com.example.webmorda_backend.repository.RoleRepository;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +74,7 @@ public class AuthController {
     }
 
     @GetMapping("/agents")
-    private ResponseEntity<?> getAgents(){
+    private ResponseEntity<?> getAgents() {
         List<String> agents = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader("/etc/asterisk/sip.conf"))) {
             String line;
@@ -88,5 +90,26 @@ public class AuthController {
             e.printStackTrace();
         }
         return ResponseEntity.status(HttpStatus.OK).body(agents);
+    }
+
+    @PostMapping("/agent")
+    private ResponseEntity<?> addAgent(@RequestBody AgentRequest agentRequest) {
+        String agentConfig = String.format(
+                "[%s]\n" +
+                        "type=friend\n" +
+                        "secret=%s\n" +
+                        "context=%s\n" +
+                        "host=dynamic\n" +
+                        agentRequest.getAgentName(), agentRequest.getAgentSecret(), agentRequest.getAgentContext()
+        );
+        String filePath = "/home/azamat/Documents/test.txt";
+        try {
+            FileWriter fileWriter = new FileWriter(filePath, true);
+            fileWriter.write(agentConfig);
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
