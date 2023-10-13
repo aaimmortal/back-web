@@ -18,10 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,19 +91,21 @@ public class AuthController {
 
     @PostMapping("/agent")
     private ResponseEntity<?> addAgent(@RequestBody AgentRequest agentRequest) {
-        String agentConfig = String.format(
-                "[%s]\n" +
-                        "type=friend\n" +
-                        "secret=%s\n" +
-                        "context=%s\n" +
-                        "host=dynamic\n" +
-                        agentRequest.getAgentName(), agentRequest.getAgentSecret(), agentRequest.getAgentContext()
-        );
         String filePath = "/home/azamat/Documents/test.txt";
         try {
             FileWriter fileWriter = new FileWriter(filePath, true);
-            fileWriter.write(agentConfig);
-            fileWriter.close();
+            BufferedWriter writer = new BufferedWriter(fileWriter);
+            writer.write("[" + agentRequest.getAgentName() + "]");
+            writer.newLine();
+            writer.write("type=friend");
+            writer.newLine();
+            writer.write("secret=" + agentRequest.getAgentSecret());
+            writer.newLine();
+            writer.write("host=dynamic");
+            writer.newLine();
+            writer.write("context=" + agentRequest.getAgentContext());
+            writer.newLine();
+            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
