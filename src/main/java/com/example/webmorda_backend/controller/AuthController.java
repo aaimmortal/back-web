@@ -95,6 +95,7 @@ public class AuthController {
         try {
             FileWriter fileWriter = new FileWriter(filePath, true);
             BufferedWriter writer = new BufferedWriter(fileWriter);
+            writer.newLine();
             writer.write("[" + agentRequest.getAgentName() + "]");
             writer.newLine();
             writer.write("type=friend");
