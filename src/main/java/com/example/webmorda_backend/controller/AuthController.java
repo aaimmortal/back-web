@@ -91,7 +91,7 @@ public class AuthController {
 
     @PostMapping("/agent")
     private ResponseEntity<?> addAgent(@RequestBody AgentRequest agentRequest) {
-        String filePath = "/home/azamat/Documents/test.txt";
+        String filePath = "/etc/asterisk/sip.conf";
         try {
             FileWriter fileWriter = new FileWriter(filePath, true);
             BufferedWriter writer = new BufferedWriter(fileWriter);
