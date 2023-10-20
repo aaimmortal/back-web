@@ -1,7 +1,7 @@
 package com.example.webmorda_backend.controller;
 
 import com.example.webmorda_backend.entity.User;
-import com.example.webmorda_backend.payload.UploadImageRequest;
+
 import com.example.webmorda_backend.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -11,9 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,13 +45,11 @@ public class UserController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadImage(@RequestBody UploadImageRequest uploadImageRequest) {
+    public ResponseEntity<?> uploadImage(@RequestParam(name = "login") String login, @RequestParam(name = "file") byte[] file) {
         try {
-            String login = uploadImageRequest.getLogin();
-            byte[] file = uploadImageRequest.getFile();
             String directory = "/home/azamat/Documents/avatars/";
             User user = userService.getUser(login);
-            String fileName = uploadImageRequest.getLogin() + "_" + UUID.randomUUID();
+            String fileName = login + "_" + UUID.randomUUID();
             user.setAvatar(fileName);
             Files.write(Paths.get(directory + fileName), file);
             return ResponseEntity.status(HttpStatus.OK).body("File uploaded");
