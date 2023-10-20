@@ -9,14 +9,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -24,10 +24,12 @@ import java.nio.file.Paths;
 @RequestMapping("/api/")
 public class UserController {
     UserService userService;
-    public ResponseEntity<?> getUser(@RequestParam(name = "login") String login){
+
+    public ResponseEntity<?> getUser(@RequestParam(name = "login") String login) {
         User user = userService.getUser(login);
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
+
     public ResponseEntity<Resource> getImage(@RequestParam(name = "file") String file) throws IOException {
         Path imagePath = Paths.get("/home/azamat/Documents/avatars/" + file);
         Resource resource = new UrlResource(imagePath.toUri());
@@ -37,6 +39,21 @@ public class UserController {
             return ResponseEntity.ok().headers(headers).body(resource);
         } else {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<?> uploadImage(@RequestParam(name = "login") String login, @RequestParam("file") MultipartFile file) {
+        try {
+            String directory = "/home/azamat/Documents/avatars/";
+            User user = userService.getUser(login);
+            String fileName = file.getOriginalFilename();
+            user.setAvatar(fileName);
+            new File(directory).mkdirs();
+            file.transferTo(new File(directory + fileName));
+            return ResponseEntity.status(HttpStatus.OK).body("File uploaded");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error uploading image:");
         }
     }
 }
