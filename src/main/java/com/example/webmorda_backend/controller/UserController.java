@@ -31,7 +31,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
     @GetMapping("/getImage")
-    public ResponseEntity<Resource> getImage(@RequestParam(name = "login") String login) throws IOException {
+    public ResponseEntity<?> getImage(@RequestParam(name = "login") String login) throws IOException {
         User user = userService.getUser(login);
         String file = user.getAvatar();
         Path imagePath = Paths.get("/home/azamat/Documents/avatars/" + file);
@@ -41,7 +41,7 @@ public class UserController {
             headers.add(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_JPEG_VALUE);
             return ResponseEntity.ok().headers(headers).body(resource);
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No image found");
         }
     }
 
