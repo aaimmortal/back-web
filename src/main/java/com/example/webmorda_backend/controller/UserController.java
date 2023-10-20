@@ -11,9 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
@@ -45,13 +46,13 @@ public class UserController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadImage(@RequestParam(name = "login") String login, @RequestParam(name = "file") byte[] file) {
+    public ResponseEntity<?> uploadImage(@RequestParam(name = "login") String login, @RequestParam(name = "file") MultipartFile file) {
         try {
             String directory = "/home/azamat/Documents/avatars/";
             User user = userService.getUser(login);
             String fileName = login + "_" + UUID.randomUUID();
             user.setAvatar(fileName);
-            Files.write(Paths.get(directory + fileName), file);
+            file.transferTo(new File(directory + fileName));
             return ResponseEntity.status(HttpStatus.OK).body("File uploaded");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error uploading image:");
