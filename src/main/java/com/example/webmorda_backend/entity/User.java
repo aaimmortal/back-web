@@ -20,6 +20,8 @@ public class User {
     private String login;
     @Column(name = "password")
     private String password;
+    @Column(name = "avatar")
+    private String avatar;
     @ManyToMany(fetch = FetchType.EAGER)
     List<Role> roles;
 }
