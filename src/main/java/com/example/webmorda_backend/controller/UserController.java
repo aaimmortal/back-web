@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
@@ -31,7 +32,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
-    public ResponseEntity<Resource> getImage(@RequestParam(name = "file") String file) throws IOException {
+    public ResponseEntity<Resource> getImage(@RequestParam(name = "login") String login) throws IOException {
+        User user = userService.getUser(login);
+        String file = user.getAvatar();
         Path imagePath = Paths.get("/home/azamat/Documents/avatars/" + file);
         Resource resource = new UrlResource(imagePath.toUri());
         if (resource.exists() && resource.isReadable()) {
@@ -47,13 +50,12 @@ public class UserController {
     public ResponseEntity<?> uploadImage(@RequestBody UploadImageRequest uploadImageRequest) {
         try {
             String login = uploadImageRequest.getLogin();
-            MultipartFile file = uploadImageRequest.getFile();
+            byte[] file = uploadImageRequest.getFile();
             String directory = "/home/azamat/Documents/avatars/";
             User user = userService.getUser(login);
-            String fileName = file.getOriginalFilename();
+            String fileName = uploadImageRequest.getLogin() + "_" + UUID.randomUUID();
             user.setAvatar(fileName);
-            new File(directory).mkdirs();
-            file.transferTo(new File(directory + fileName));
+            Files.write(Paths.get(directory + fileName), file);
             return ResponseEntity.status(HttpStatus.OK).body("File uploaded");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error uploading image:");
