@@ -25,12 +25,12 @@ import java.util.UUID;
 @RequestMapping("/api/")
 public class UserController {
     UserService userService;
-
+    @GetMapping("/getUser")
     public ResponseEntity<?> getUser(@RequestParam(name = "login") String login) {
         User user = userService.getUser(login);
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
-
+    @GetMapping("/getImage")
     public ResponseEntity<Resource> getImage(@RequestParam(name = "login") String login) throws IOException {
         User user = userService.getUser(login);
         String file = user.getAvatar();
@@ -52,6 +52,7 @@ public class UserController {
             User user = userService.getUser(login);
             String fileName = login + "_" + UUID.randomUUID();
             user.setAvatar(fileName);
+            userService.update(user);
             file.transferTo(new File(directory + fileName));
             return ResponseEntity.status(HttpStatus.OK).body("File uploaded");
         } catch (Exception e) {

@@ -18,7 +18,9 @@ import java.util.Collection;
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
     UserRepository userRepository;
-
+    public void update(User user) {
+        userRepository.save(user);
+    }
     public User getUser(String login) {
         return userRepository.findUserByLogin(login);
     }
