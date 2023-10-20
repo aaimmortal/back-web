@@ -1,6 +1,7 @@
 package com.example.webmorda_backend.controller;
 
 import com.example.webmorda_backend.entity.User;
+import com.example.webmorda_backend.payload.UploadImageRequest;
 import com.example.webmorda_backend.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -43,8 +44,10 @@ public class UserController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadImage(@RequestParam(name = "login") String login, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> uploadImage(@RequestBody UploadImageRequest uploadImageRequest) {
         try {
+            String login = uploadImageRequest.getLogin();
+            MultipartFile file = uploadImageRequest.getFile();
             String directory = "/home/azamat/Documents/avatars/";
             User user = userService.getUser(login);
             String fileName = file.getOriginalFilename();
