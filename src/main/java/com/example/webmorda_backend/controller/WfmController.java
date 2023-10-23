@@ -34,8 +34,8 @@ public class WfmController {
 
     @GetMapping("/wfmGraph")
     public ResponseEntity<?> wfmGraph(@RequestParam("date") String date, @RequestParam("agents") String agents, @RequestParam("startTime") String time1, @RequestParam("endTime") String time2) {
-        String dateTime = date + time1;
-        String dateTime2 = dateTime + time2;
+        String dateTime = date + " " + time1;
+        String dateTime2 = dateTime + " " + time2;
         LocalDateTime[] range = callDataService.getRange(dateTime, dateTime2);
         List<List<Wfm>> res = new ArrayList<>();
         String[] agentids = agents.split(" ");
