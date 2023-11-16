@@ -36,7 +36,25 @@ public class AsteriskAmiService {
                     if (event instanceof QueueMemberStatusEvent) {
                         String agentId = ((QueueMemberStatusEvent) event).getInterface().substring(4);
                         int statusCode = ((QueueMemberStatusEvent) event).getStatus();
-                        String status = (statusCode == 5 || statusCode == 0) ? "Offline" : "Online";
+                        String status;
+                        switch (statusCode){
+                            case 1: {
+                                status = "Не используется";
+                            }
+                            case 2: {
+                                status = "В разговоре";
+                            }
+                            case 5: {
+                                status = "Не доступен";
+                            }
+                            case 8: {
+                                status = "На удержаний";
+                            }
+                            default: {
+                                status = "Не доступен";
+                            }
+                        }
+
                         messagingTemplate.convertAndSend("/topic/agentStatus", new StatusUpdate(agentId, status));
                     }
                     if (event instanceof VarSetEvent varSetEvent) {
