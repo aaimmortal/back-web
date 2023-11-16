@@ -3,11 +3,13 @@ package com.example.webmorda_backend.service;
 import com.example.webmorda_backend.entity.AgentCallData;
 import com.example.webmorda_backend.entity.CallData;
 import com.example.webmorda_backend.entity.Wfm;
+import com.example.webmorda_backend.model.StatusUpdate;
 import lombok.AllArgsConstructor;
 import org.asteriskjava.manager.DefaultManagerConnection;
 import org.asteriskjava.manager.ManagerConnection;
 import org.asteriskjava.manager.ManagerEventListener;
 import org.asteriskjava.manager.event.*;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
@@ -20,6 +22,9 @@ public class AsteriskAmiService {
     CallDataService callDataService;
     WfmService wfmService;
 
+    SimpMessagingTemplate messagingTemplate;
+
+
     public void subscribeToQueueEvents() {
         ManagerConnection amiConnection = new DefaultManagerConnection("172.16.3.185", "aster", "secret");
         try {
@@ -28,13 +33,19 @@ public class AsteriskAmiService {
                 @Override
                 public void onManagerEvent(ManagerEvent event) {
                     System.out.println(event.toString());
+                    if (event instanceof QueueMemberStatusEvent) {
+                        String agentId = ((QueueMemberStatusEvent) event).getInterface().substring(4);
+                        int statusCode = ((QueueMemberStatusEvent) event).getStatus();
+                        String status = (statusCode == 5 || statusCode == 0) ? "Offline" : "Online";
+                        messagingTemplate.convertAndSend("/topic/agentStatus", new StatusUpdate(agentId, status));
+                    }
                     if (event instanceof VarSetEvent varSetEvent) {
                         String variable = varSetEvent.getVariable();
                         String value = varSetEvent.getValue();
                         String agentId = varSetEvent.getCallerIdNum();
                         LocalDateTime localDateTime = convertToLocalDateTimeViaInstant(varSetEvent.getDateReceived());
                         if ((variable.equals("PQMSTATUS") && value.equals("PAUSED")) || variable.equals("UPQMSTATUS") && value.equals("UNPAUSED")) {
-                            if (value.equals("PAUSED")){
+                            if (value.equals("PAUSED")) {
                                 Wfm wfm = new Wfm();
                                 wfm.setAgentid(agentId);
                                 wfm.setDate(localDateTime);
