@@ -40,15 +40,19 @@ public class AsteriskAmiService {
                         switch (statusCode){
                             case 1: {
                                 status = "Не используется";
+                                break;
                             }
                             case 2: {
                                 status = "В разговоре";
+                                break;
                             }
                             case 5: {
                                 status = "Не доступен";
+                                break;
                             }
                             case 8: {
                                 status = "На удержаний";
+                                break;
                             }
                             default: {
                                 status = "Не доступен";
