@@ -20,6 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @RequestMapping("/api/")
 public class AgentController {
+    @Autowired
     AgentService agentService;
     @GetMapping("/agentStatus")
     public ResponseEntity<?> getAll() {
