@@ -21,9 +21,8 @@ public class AsteriskAmiService {
     AgentCallDataService agentCallDataService;
     CallDataService callDataService;
     WfmService wfmService;
-
     SimpMessagingTemplate messagingTemplate;
-
+    AgentService agentService;
 
     public void subscribeToQueueEvents() {
         ManagerConnection amiConnection = new DefaultManagerConnection("172.16.3.185", "aster", "secret");
@@ -61,7 +60,7 @@ public class AsteriskAmiService {
                                 status = "Не доступен";
                             }
                         }
-
+                        agentService.update(agentId, status, lastCallFormatted, paused);
                         messagingTemplate.convertAndSend("/topic/agentStatus", new StatusUpdate(agentId, status, paused, lastCallFormatted));
                     }
                     if (event instanceof VarSetEvent varSetEvent) {
