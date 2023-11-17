@@ -36,6 +36,7 @@ public class AsteriskAmiService {
                     if (event instanceof QueueMemberStatusEvent) {
                         String agentId = ((QueueMemberStatusEvent) event).getInterface().substring(4);
                         int statusCode = ((QueueMemberStatusEvent) event).getStatus();
+                        String paused = ((QueueMemberStatusEvent) event).getPaused() ? "Да" : "Нет";
                         String status;
                         switch (statusCode){
                             case 1: {
@@ -59,7 +60,7 @@ public class AsteriskAmiService {
                             }
                         }
 
-                        messagingTemplate.convertAndSend("/topic/agentStatus", new StatusUpdate(agentId, status));
+                        messagingTemplate.convertAndSend("/topic/agentStatus", new StatusUpdate(agentId, status, paused));
                     }
                     if (event instanceof VarSetEvent varSetEvent) {
                         String variable = varSetEvent.getVariable();
