@@ -37,8 +37,10 @@ public class AsteriskAmiService {
                         String agentId = ((QueueMemberStatusEvent) event).getInterface().substring(4);
                         int statusCode = ((QueueMemberStatusEvent) event).getStatus();
                         String paused = ((QueueMemberStatusEvent) event).getPaused() ? "Да" : "Нет";
+                        long lastCall = ((QueueMemberStatusEvent) event).getLastCall();
+                        LocalDateTime lastCallFormatted = LocalDateTime.ofInstant(Instant.ofEpochMilli(lastCall), ZoneId.systemDefault());
                         String status;
-                        switch (statusCode){
+                        switch (statusCode) {
                             case 1: {
                                 status = "Не используется";
                                 break;
@@ -60,7 +62,7 @@ public class AsteriskAmiService {
                             }
                         }
 
-                        messagingTemplate.convertAndSend("/topic/agentStatus", new StatusUpdate(agentId, status, paused));
+                        messagingTemplate.convertAndSend("/topic/agentStatus", new StatusUpdate(agentId, status, paused, lastCallFormatted));
                     }
                     if (event instanceof VarSetEvent varSetEvent) {
                         String variable = varSetEvent.getVariable();
