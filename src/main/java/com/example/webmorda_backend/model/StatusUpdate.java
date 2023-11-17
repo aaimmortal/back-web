@@ -8,4 +8,5 @@ import lombok.Data;
 public class StatusUpdate {
     String agentid;
     String status;
+    String paused;
 }
