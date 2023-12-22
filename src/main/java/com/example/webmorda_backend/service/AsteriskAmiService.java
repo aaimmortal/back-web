@@ -25,7 +25,7 @@ public class AsteriskAmiService {
     AgentService agentService;
 
     public void subscribeToQueueEvents() {
-        ManagerConnection amiConnection = new DefaultManagerConnection("172.16.3.185", "aster", "secret");
+        ManagerConnection amiConnection = new DefaultManagerConnection("172.16.3.184", "aster", "secret");
         try {
             amiConnection.login();
             amiConnection.addEventListener(new ManagerEventListener() {

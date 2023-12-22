@@ -1,1 +1,0 @@
-ALTER TABLE `agent_calldata` ADD COLUMN `calldate` DATETIME;
